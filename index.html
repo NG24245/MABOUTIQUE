@@ -1,40 +1,52 @@
 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta name="google-site-verification" content="Fy6EtwcIZm3fwwpn2ZWtiaNkknnJK11bK4tFoAL5V8E" /> 
+<meta name="google-site-verification" content="Fy6EtwcIZm3fwwpn2ZWtiaNkknnJK11bK4tFoAL5V8E" />    
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>INFINITY GAMES CG</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+:root{--bg:#070914;--panel:rgba(13,20,39,.86);--cyan:#54e7ff;--violet:#8b5cf6;--text:#f5f7ff;--muted:#aab6d2}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#050914;color:white;font-family:Arial,sans-serif}
-header{text-align:center;padding:25px;background:#080f20;border-bottom:2px solid #007bff}
-header h1{color:#00aaff;text-shadow:0 0 15px #007bff;font-size:30px}
-header p{margin-top:10px;color:#b8c9e8}
-nav{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:20px;background:#0b1020}
-.btn{padding:13px 20px;background:#007bff;color:white;text-decoration:none;border-radius:8px;font-weight:bold}
-.admin{background:#101b30;border:1px solid #00aaff}
-.hero{text-align:center;padding:45px 20px;background:linear-gradient(135deg,#06152e,#050914)}
-.hero h2{font-size:30px;color:#00aaff;margin-bottom:15px}
-.hero p{color:#c0d3ef;margin-bottom:20px;line-height:1.6}
-section{padding:30px 20px}
-.section-title{text-align:center;color:#00aaff;margin-bottom:25px;font-size:26px}
-.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;max-width:1200px;margin:auto}
-.card{background:#101a2e;border:1px solid #17375d;border-radius:15px;padding:15px;box-shadow:0 0 12px #007bff20}
-.card img{width:100%;height:190px;object-fit:contain;background:#071120;border-radius:10px;margin-bottom:15px}
-.card h3{color:#00aaff;margin-bottom:10px}
-.category{color:#9eb6d9;font-size:13px;margin-bottom:10px}
-.description{color:#d0d9e8;margin-bottom:12px;line-height:1.5}
-.price{color:#00ff99;font-size:20px;font-weight:bold;margin:15px 0}
-.order{display:block;text-align:center;background:#128c48;padding:12px;color:white;text-decoration:none;border-radius:8px;font-weight:bold}
-.order:hover{background:#0b6733}
-.empty{text-align:center;color:#a9bad3;padding:30px}
-footer{text-align:center;background:#080f20;padding:25px;border-top:1px solid #007bff;color:#9eb6d9;margin-top:30px;line-height:1.7}
-footer strong{color:#00aaff}
-@media(max-width:600px){header h1{font-size:23px}.hero h2{font-size:24px}nav{flex-direction:column}.btn{text-align:center}}
+html{scroll-behavior:smooth}
+body{background:#060812;color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.55;overflow-x:hidden}
+body:before{content:"";position:fixed;inset:0;z-index:-2;background:
+linear-gradient(120deg,rgba(4,7,18,.93),rgba(5,10,25,.72) 48%,rgba(12,5,28,.82)),
+url("https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=2400&q=85") center/cover no-repeat}
+body:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 15% 15%,#0ea5e926,transparent 32%),radial-gradient(circle at 85% 60%,#8b5cf626,transparent 35%)}
+header{text-align:center;padding:34px 18px 26px;background:rgba(5,9,20,.65);backdrop-filter:blur(14px);border-bottom:1px solid #54e7ff40}
+header h1{color:#fff;font-size:clamp(26px,4vw,42px);letter-spacing:2px;text-shadow:0 0 25px #00c8ff75}
+header p{margin-top:8px;color:#c2cce4}
+nav{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:18px;background:#080d1acc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:5;border-bottom:1px solid #ffffff10}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 21px;background:linear-gradient(135deg,#0891b2,#2563eb);color:white;text-decoration:none;border-radius:12px;font-weight:700;border:1px solid #8beaff45;box-shadow:0 8px 24px #0284c733;transition:transform .2s,box-shadow .2s;min-height:48px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px #0284c755}
+.admin{background:rgba(20,30,52,.8);border:1px solid #54e7ff55}
+.hero{max-width:1100px;margin:34px auto 18px;padding:clamp(45px,8vw,95px) 22px;text-align:center;border:1px solid #ffffff18;border-radius:26px;background:linear-gradient(135deg,#08172dcc,#100b28bb);backdrop-filter:blur(10px);box-shadow:0 25px 80px #0005;position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;width:320px;height:320px;border-radius:50%;background:#06b6d430;filter:blur(70px);top:-150px;left:-80px}
+.hero h2{position:relative;font-size:clamp(28px,5vw,48px);line-height:1.15;color:#fff;margin-bottom:18px;text-shadow:0 0 25px #38bdf855}
+.hero p{position:relative;color:#d0d9ee;margin-bottom:27px;line-height:1.8;font-size:17px}
+section{padding:48px 20px}
+.section-title{text-align:center;color:#fff;margin-bottom:30px;font-size:clamp(25px,4vw,34px)}
+.section-title:after{content:"";display:block;width:65px;height:4px;border-radius:9px;background:linear-gradient(90deg,var(--cyan),var(--violet));margin:12px auto 0}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:24px;max-width:1200px;margin:auto}
+.card{background:linear-gradient(155deg,rgba(18,28,51,.95),rgba(9,14,29,.94));border:1px solid #7dd3fc25;border-radius:20px;padding:17px;box-shadow:0 15px 35px #0004;transition:transform .25s,border-color .25s,box-shadow .25s;display:flex;flex-direction:column;min-width:0}
+.card:hover{transform:translateY(-6px);border-color:#54e7ff70;box-shadow:0 22px 45px #0006,0 0 25px #0891b220}
+.card img{width:100%;height:210px;object-fit:contain;background:radial-gradient(circle,#172746,#080d18);border-radius:14px;margin-bottom:17px;padding:10px}
+.card h3{color:#71e8ff;font-size:20px;margin-bottom:7px}
+.category{color:#a5b4fc;font-size:13px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.7px}
+.description{color:#cbd5e1;margin-bottom:12px;line-height:1.6}
+.price{color:#6effc0;font-size:21px;font-weight:800;margin:14px 0}
+.order{display:block;text-align:center;background:linear-gradient(135deg,#16a34a,#059669);padding:14px;color:white;text-decoration:none;border-radius:12px;font-weight:800;margin-top:auto;min-height:49px;transition:filter .2s,transform .2s}
+.order:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.empty{text-align:center;color:#c3cde0;padding:30px}
+footer{text-align:center;background:#050914df;backdrop-filter:blur(12px);padding:30px 20px;border-top:1px solid #54e7ff35;color:#aab6d2;margin-top:35px;line-height:1.9}
+footer strong{color:#71e8ff}
+@media(max-width:600px){header{padding:25px 14px}nav{position:relative;flex-direction:column;padding:15px}.btn{width:100%;text-align:center}.hero{margin:18px 12px;border-radius:20px}.hero h2{font-size:27px}section{padding:35px 14px}.products{gap:17px}.card img{height:190px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto;transition:none!important}}
 </style>
 </head>
 
@@ -149,9 +161,20 @@ const card=document.createElement("article");
 card.className="card";
 
 const img=document.createElement("img");
-img.src=product.image_url||"https://placehold.co/400x250/071120/00aaff?text=INFINITY+GAMES";
-img.alt=product.name;
-img.onerror=()=>{img.src="https://placehold.co/400x250/071120/00aaff?text=Console+Gaming"};
+// Images par console : utilisées si un produit Supabase n'a pas de photo.
+const nom=(product.name||"").toLowerCase();
+const categorie=(product.category||"").toLowerCase();
+const imageConsole = nom.includes("ps5")||categorie.includes("playstation 5")
+ ? "https://www.camera-warehouse.com.au/media/catalog/product/p/l/playstation_164613_1_2.jpg"
+ : nom.includes("ps3")||categorie.includes("playstation 3")
+ ? "https://images-cdn.ubuy.co.in/65115f65effc701a9e53378f-sony-playstation-3-slim-120gb-black.jpg"
+ : nom.includes("xbox")||categorie.includes("xbox")
+ ? "https://i.erli.pl/g98fiy.ef9cce.xl.webp"
+ : "https://retrogamesshop.de/cdn/shop/files/9935eb3fbd4164ec680ec641584c6cb5.jpg?v=1704325539&width=533";
+img.src=product.image_url||imageConsole;
+img.alt="Photo de "+product.name;
+img.loading="lazy";
+img.onerror=()=>{img.onerror=null;img.src="https://placehold.co/600x400/101a2e/54e7ff?text=INFINITY+GAMES";};
 
 const title=document.createElement("h3");
 title.textContent=product.name;
