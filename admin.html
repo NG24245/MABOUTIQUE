@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administration - INFINITY GAMES CG</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #050914;
+  color: white;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+h1 {
+  color: #00aaff;
+  text-align: center;
+}
+
+.container {
+  max-width: 650px;
+  margin: auto;
+  background: #101a2e;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px #007bff44;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 13px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: 1px solid #263c5e;
+  background: #071120;
+  color: white;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: #007bff;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+.home {
+  background: #12a150;
+}
+
+.home:hover {
+  background: #087a38;
+}
+
+.danger {
+  background: #dc3545;
+}
+
+.product {
+  background: #071120;
+  padding: 15px;
+  margin-top: 15px;
+  border-radius: 10px;
+}
+
+.product img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+#dashboard {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🎮 INFINITY GAMES CG</h1>
+
+<div class="container">
+
+<!-- CONNEXION -->
+<div id="login">
+  <h2>🔐 Connexion propriétaire</h2>
+
+  <input id="email" type="email"
+         placeholder="Ton email administrateur">
+
+  <input id="password" type="password"
+         placeholder="Ton mot de passe">
+
+  <button onclick="login()">
+    🔐 Se connecter
+  </button>
+
+  <p id="message"></p>
+</div>
+
+<!-- ESPACE ADMIN -->
+<div id="dashboard">
+
+  <h2>📦 Mon espace propriétaire</h2>
+
+  <button onclick="logout()" class="danger">
+    Déconnexion
+  </button>
+
+  <button onclick="window.location.href='index.html'" class="home">
+    🏠 Retour à l'accueil
+  </button>
+
+  <hr>
+
+  <h2>➕ Publier un article</h2>
+
+  <input id="name" placeholder="Nom du produit">
+
+  <select id="category">
+    <option value="PS3">PlayStation 3</option>
+    <option value="PS4">PlayStation 4</option>
+    <option value="PS5">PlayStation 5</option>
+    <option value="Xbox">Xbox</option>
+    <option value="Jeux">Jeux vidéo</option>
+    <option value="Accessoires">Accessoires</option>
+  </select>
+
+  <textarea id="description"
+            placeholder="Description du produit"></textarea>
+
+  <input id="price" type="number"
+         placeholder="Prix en FCFA">
+
+  <input id="image" type="url"
+         placeholder="URL de l'image du produit">
+
+  <button onclick="addProduct()">
+    🚀 Publier l'article
+  </button>
+
+  <p id="result"></p>
+
+  <button onclick="window.location.href='index.html'" class="home">
+    🏠 Retour à la boutique après publication
+  </button>
+
+  <hr>
+
+  <h2>📋 Mes articles publiés</h2>
+
+  <div id="products"></div>
+
+</div>
+</div>
+
+<script>
+
+// =====================================
+// CONFIGURATION SUPABASE
+// =====================================
+
+const SUPABASE_URL = "https://onpadnjjjnmovwyipunf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mdUHsvyXcNa1fhAsGTRffg_ZW1Gf9yq";
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+// =====================================
+// CONNEXION
+// =====================================
+
+async function login() {
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const { error } = await db.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    document.getElementById("message").textContent =
+      "Erreur : " + error.message;
+    return;
+  }
+
+  await checkAdmin();
+}
+
+// =====================================
+// VERIFICATION ADMIN
+// =====================================
+
+async function checkAdmin() {
+
+  const { data: userData } = await db.auth.getUser();
+
+  if (!userData.user) return;
+
+  const { data, error } = await db.rpc("is_admin");
+
+  if (error || data !== true) {
+
+    document.getElementById("message").textContent =
+      "Accès réservé au propriétaire.";
+
+    await db.auth.signOut();
+    return;
+  }
+
+  document.getElementById("login").style.display = "none";
+  document.getElementById("dashboard").style.display = "block";
+
+  loadProducts();
+}
+
+// =====================================
+// DECONNEXION
+// =====================================
+
+async function logout() {
+  await db.auth.signOut();
+  location.reload();
+}
+
+// =====================================
+// PUBLIER UN ARTICLE
+// =====================================
+
+async function addProduct() {
+
+  const name = document.getElementById("name").value.trim();
+  const category = document.getElementById("category").value;
+  const description = document.getElementById("description").value.trim();
+  const price = Number(document.getElementById("price").value);
+  const image_url = document.getElementById("image").value.trim();
+
+  if (!name || !price || price <= 0) {
+    alert("Remplis le nom et un prix valide.");
+    return;
+  }
+
+  const product = {
+    name,
+    category,
+    description,
+    price,
+    image_url
+  };
+
+  const { error } = await db
+    .from("products")
+    .insert(product);
+
+  if (error) {
+    document.getElementById("result").textContent =
+      "Erreur : " + error.message;
+    return;
+  }
+
+  document.getElementById("result").textContent =
+    "✅ Article publié avec succès !";
+
+  document.getElementById("name").value = "";
+  document.getElementById("description").value = "";
+  document.getElementById("price").value = "";
+  document.getElementById("image").value = "";
+
+  loadProducts();
+}
+
+// =====================================
+// AFFICHER LES ARTICLES
+// =====================================
+
+async function loadProducts() {
+
+  const { data, error } = await db
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  const container = document.getElementById("products");
+
+  if (error) {
+    container.textContent = error.message;
+    return;
+  }
+
+  container.innerHTML = "";
+
+  data.forEach(product => {
+
+    const div = document.createElement("div");
+    div.className = "product";
+
+    const title = document.createElement("h3");
+    title.textContent = product.name;
+
+    const price = document.createElement("p");
+    price.textContent =
+      Number(product.price || 0).toLocaleString("fr-FR") + " FCFA";
+
+    div.appendChild(title);
+    div.appendChild(price);
+
+    if (product.image_url) {
+      const img = document.createElement("img");
+      img.src = product.image_url;
+      img.alt = product.name;
+      div.appendChild(img);
+    }
+
+    const del = document.createElement("button");
+    del.className = "danger";
+    del.textContent = "🗑️ Supprimer l'article";
+    del.onclick = () => deleteProduct(product.id);
+
+    div.appendChild(del);
+    container.appendChild(div);
+  });
+}
+
+// =====================================
+// SUPPRIMER UN ARTICLE
+// =====================================
+
+async function deleteProduct(id) {
+
+  if (!confirm("Veux-tu vraiment supprimer cet article ?")) return;
+
+  const { error } = await db
+    .from("products")
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    alert(error.message);
+  } else {
+    loadProducts();
+  }
+}
+
+// =====================================
+// SESSION EXISTANTE
+// =====================================
+
+checkAdmin();
+
+</script>
+
+</body>
+</html>

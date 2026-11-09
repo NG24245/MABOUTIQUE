@@ -1,0 +1,85 @@
+
+:root {
+    --bg: #030712;
+    --card: #071426;
+    --purple: #00aaff;
+    --blue: #00e5ff;
+    --green: #00c853;
+    --white: #ffffff;
+    --gray: #a5c4dc;
+}
+
+body {
+    background: #030712;
+    color: white;
+}
+
+.logo span {
+    color: #00e5ff;
+    text-shadow: 0 0 15px #00e5ff;
+}
+
+.hero {
+    background:
+        radial-gradient(circle at 80% 50%, #003b70 0%, transparent 40%),
+        radial-gradient(circle at 20% 20%, #001f46 0%, transparent 40%),
+        linear-gradient(135deg, #020617, #061426);
+}
+
+.hero h1 span {
+    background: linear-gradient(90deg, #008cff, #00e5ff);
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.category, .product {
+    background: #071426;
+    border: 1px solid #003b70;
+    box-shadow: 0 0 10px #008cff15;
+    transition: .3s;
+}
+
+.category:hover, .product:hover {
+    border-color: #00e5ff;
+    box-shadow: 0 0 20px #00aaff55;
+    transform: translateY(-5px);
+}
+
+.btn-primary {
+    background: linear-gradient(90deg, #006eff, #00d9ff);
+    box-shadow: 0 0 15px #008cff55;
+}
+
+.btn-secondary {
+    border: 1px solid #00e5ff;
+    color: #00e5ff;
+    box-shadow: 0 0 10px #00e5ff20;
+}
+
+.product-image {
+    background: linear-gradient(135deg, #06152e, #003b70);
+}
+
+.products {
+    background: #040914;
+}
+
+.section-title {
+    text-shadow: 0 0 12px #008cff55;
+}
+
+.search-box {
+    background: #071426;
+    border: 1px solid #006eff;
+}
+
+.search-box:focus {
+    border-color: #00e5ff;
+    box-shadow: 0 0 15px #00e5ff40;
+}
+
+.promo {
+    background: linear-gradient(135deg, #001c42, #003b70);
+    border: 1px solid #00aaff55;
+    box-shadow: 0 0 25px #008cff20;
+}

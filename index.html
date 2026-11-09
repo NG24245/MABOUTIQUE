@@ -1,0 +1,195 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INFINITY GAMES CG</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050914;color:white;font-family:Arial,sans-serif}
+header{text-align:center;padding:25px;background:#080f20;border-bottom:2px solid #007bff}
+header h1{color:#00aaff;text-shadow:0 0 15px #007bff;font-size:30px}
+header p{margin-top:10px;color:#b8c9e8}
+nav{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:20px;background:#0b1020}
+.btn{padding:13px 20px;background:#007bff;color:white;text-decoration:none;border-radius:8px;font-weight:bold}
+.admin{background:#101b30;border:1px solid #00aaff}
+.hero{text-align:center;padding:45px 20px;background:linear-gradient(135deg,#06152e,#050914)}
+.hero h2{font-size:30px;color:#00aaff;margin-bottom:15px}
+.hero p{color:#c0d3ef;margin-bottom:20px;line-height:1.6}
+section{padding:30px 20px}
+.section-title{text-align:center;color:#00aaff;margin-bottom:25px;font-size:26px}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;max-width:1200px;margin:auto}
+.card{background:#101a2e;border:1px solid #17375d;border-radius:15px;padding:15px;box-shadow:0 0 12px #007bff20}
+.card img{width:100%;height:190px;object-fit:contain;background:#071120;border-radius:10px;margin-bottom:15px}
+.card h3{color:#00aaff;margin-bottom:10px}
+.category{color:#9eb6d9;font-size:13px;margin-bottom:10px}
+.description{color:#d0d9e8;margin-bottom:12px;line-height:1.5}
+.price{color:#00ff99;font-size:20px;font-weight:bold;margin:15px 0}
+.order{display:block;text-align:center;background:#128c48;padding:12px;color:white;text-decoration:none;border-radius:8px;font-weight:bold}
+.order:hover{background:#0b6733}
+.empty{text-align:center;color:#a9bad3;padding:30px}
+footer{text-align:center;background:#080f20;padding:25px;border-top:1px solid #007bff;color:#9eb6d9;margin-top:30px;line-height:1.7}
+footer strong{color:#00aaff}
+@media(max-width:600px){header h1{font-size:23px}.hero h2{font-size:24px}nav{flex-direction:column}.btn{text-align:center}}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>🎮 INFINITY GAMES CG</h1>
+<p>La passion du gaming à portée de main !</p>
+</header>
+
+<nav>
+<a href="index.html" class="btn">🏠 Accueil</a>
+<a href="admin.html" class="btn admin">🔐 Se connecter</a>
+<a href="admin.html" class="btn">➕ Publier un article</a>
+</nav>
+
+<div class="hero">
+<h2>Bienvenue chez INFINITY GAMES CG</h2>
+<p>Consoles, jeux vidéo et accessoires.<br>
+Découvre nos offres et commande directement sur WhatsApp.</p>
+<a href="#produits" class="btn">🎮 Voir les produits</a>
+</div>
+
+<section id="produits">
+<h2 class="section-title">🔥 Nos produits</h2>
+<div id="products" class="products">
+<p class="empty">Chargement des produits...</p>
+</div>
+</section>
+
+<footer>
+<p><strong>INFINITY GAMES CG</strong></p>
+<p>Commandes WhatsApp : +242 05 65 17 215</p>
+<p>© 2026 INFINITY GAMES CG</p>
+</footer>
+
+<script>
+const SUPABASE_URL = "https://onpadnjjjnmovwyipunf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_mdUHsvyXcNa1fhAsGTRffg_ZW1Gf9yq";
+const WHATSAPP = "242056517215";
+
+const db = supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+const produitsInitiaux = [
+{
+name:"PS4 FAT + 5 jeux",
+category:"PlayStation 4",
+description:"Console PlayStation 4 FAT avec 5 jeux inclus.",
+price:100000,
+image_url:"https://commons.wikimedia.org/wiki/Special:FilePath/Sony-PlayStation-4-PS4-wDualShock-4.jpg"
+},
+{
+name:"PS3 Slim + 10 jeux",
+category:"PlayStation 3",
+description:"Console PlayStation 3 Slim avec 10 jeux inclus.",
+price:65000,
+image_url:"https://commons.wikimedia.org/wiki/Special:FilePath/Sony-PlayStation-PS3-Slim-Console-FR.jpg"
+},
+{
+name:"Xbox One S + 10 jeux",
+category:"Xbox",
+description:"Console Xbox One S avec 10 jeux inclus.",
+price:85000,
+image_url:"https://commons.wikimedia.org/wiki/Special:FilePath/Microsoft-Xbox-One-S-Console-FR.jpg"
+},
+{
+name:"PlayStation 5",
+category:"PlayStation 5",
+description:"PS5 disponible sur commande. Contacte-nous pour connaître le prix.",
+price:null,
+image_url:"https://commons.wikimedia.org/wiki/Special:FilePath/PlayStation_5_and_DualSense.jpg"
+}
+];
+
+async function loadProducts(){
+const container=document.getElementById("products");
+
+try{
+const {data,error}=await db.from("products")
+.select("*").order("created_at",{ascending:false});
+
+if(error)throw error;
+
+// Fusionner les consoles initiales et les produits Supabase
+const produitsSupabase=data||[];
+
+// Eviter les doublons en comparant les noms
+const nomsExistants=new Set(
+produitsSupabase.map(p=>p.name.trim().toLowerCase())
+);
+
+const produitsFixes=produitsInitiaux.filter(
+p=>!nomsExistants.has(p.name.trim().toLowerCase())
+);
+
+const liste=[...produitsFixes,...produitsSupabase];
+
+renderProducts(liste);
+
+}catch(error){
+console.error("Erreur Supabase :",error);
+renderProducts(produitsInitiaux);
+}
+}
+
+function renderProducts(liste){
+const container=document.getElementById("products");
+container.innerHTML="";
+
+liste.forEach(product=>{
+const card=document.createElement("article");
+card.className="card";
+
+const img=document.createElement("img");
+img.src=product.image_url||"https://placehold.co/400x250/071120/00aaff?text=INFINITY+GAMES";
+img.alt=product.name;
+img.onerror=()=>{img.src="https://placehold.co/400x250/071120/00aaff?text=Console+Gaming"};
+
+const title=document.createElement("h3");
+title.textContent=product.name;
+
+const category=document.createElement("p");
+category.className="category";
+category.textContent=product.category||"Gaming";
+
+const description=document.createElement("p");
+description.className="description";
+description.textContent=product.description||"";
+
+const price=document.createElement("p");
+price.className="price";
+price.textContent=product.price!=null
+?Number(product.price).toLocaleString("fr-FR")+" FCFA"
+:"Disponible sur commande";
+
+const order=document.createElement("a");
+order.className="order";
+order.target="_blank";
+order.rel="noopener noreferrer";
+
+const prixMessage=product.price!=null
+?Number(product.price).toLocaleString("fr-FR")+" FCFA"
+:"Prix sur demande";
+
+const message="Bonjour INFINITY GAMES CG, je souhaite commander : "+product.name+" - "+prixMessage;
+
+order.href="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(message);
+order.textContent="📱 Commander sur WhatsApp";
+
+card.append(img,title,category,description,price,order);
+container.appendChild(card);
+});
+}
+
+loadProducts();
+</script>
+
+</body>
+</html>
