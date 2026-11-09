@@ -90,3 +90,8 @@ body {
   margin: 10px auto;
   object-fit: contain;
 }
+.developer-signature strong {
+    color: #38bdf8;
+    text-shadow: 0 0 10px #0284c7;
+}
+
