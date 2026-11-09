@@ -10,6 +10,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+.logo-container img {
+    width: 180px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 12px #008cff);
+}
 :root{--bg:#070914;--panel:rgba(13,20,39,.86);--cyan:#54e7ff;--violet:#8b5cf6;--text:#f5f7ff;--muted:#aab6d2}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
@@ -53,7 +59,9 @@ footer strong{color:#71e8ff}
 <body>
 
 <header>
-<h1>🎮 INFINITY GAMES CG</h1>
+<div class="logo-container">
+    <img src="images/logo.png.jpeg" alt="INFINITY GAMES CG">
+</div>
 <p>La passion du gaming à portée de main !</p>
 </header>
 
