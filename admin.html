@@ -149,8 +149,11 @@ button:hover {
   <input id="price" type="number"
          placeholder="Prix en FCFA">
 
-  <input id="image" type="url"
-         placeholder="URL de l'image du produit">
+  <label for="image">📸 Photo du produit (depuis ta galerie)</label>
+  <input id="image" type="file" accept="image/*">
+  <img id="imagePreview" alt="Aperçu de la photo sélectionnée"
+       style="display:none;width:100%;max-height:300px;object-fit:contain;border-radius:10px;margin-top:10px;">
+  <small>Choisis une image dans la galerie de ton téléphone ou dans tes fichiers.</small>
 
   <button onclick="addProduct()">
     🚀 Publier l'article
@@ -172,6 +175,19 @@ button:hover {
 </div>
 
 <script>
+
+
+// Aperçu de la photo choisie
+document.getElementById("image").addEventListener("change", function () {
+  const file = this.files && this.files[0];
+  const preview = document.getElementById("imagePreview");
+  if (!file) { preview.style.display = "none"; preview.removeAttribute("src"); return; }
+  if (!file.type.startsWith("image/")) {
+    alert("Choisis un fichier image."); this.value = ""; preview.style.display = "none"; return;
+  }
+  preview.src = URL.createObjectURL(file);
+  preview.style.display = "block";
+});
 
 // =====================================
 // CONFIGURATION SUPABASE
@@ -249,45 +265,53 @@ async function logout() {
 // =====================================
 
 async function addProduct() {
-
   const name = document.getElementById("name").value.trim();
   const category = document.getElementById("category").value;
   const description = document.getElementById("description").value.trim();
   const price = Number(document.getElementById("price").value);
-  const image_url = document.getElementById("image").value.trim();
+  const imageFile = document.getElementById("image").files[0];
+  const result = document.getElementById("result");
 
   if (!name || !price || price <= 0) {
-    alert("Remplis le nom et un prix valide.");
-    return;
+    alert("Remplis le nom et un prix valide."); return;
   }
 
-  const product = {
-    name,
-    category,
-    description,
-    price,
-    image_url
-  };
+  const publishButton = document.querySelector('button[onclick="addProduct()"]');
+  publishButton.disabled = true;
+  result.textContent = "⏳ Publication en cours...";
 
-  const { error } = await db
-    .from("products")
-    .insert(product);
+  try {
+    let image_url = "";
+    if (imageFile) {
+      if (!imageFile.type.startsWith("image/")) throw new Error("Le fichier sélectionné n'est pas une image.");
+      const extension = (imageFile.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const filePath = `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
 
-  if (error) {
-    document.getElementById("result").textContent =
-      "Erreur : " + error.message;
-    return;
+      // Bucket Supabase Storage requis : product-images
+      const { error: uploadError } = await db.storage.from("product-images").upload(filePath, imageFile, {
+        cacheControl: "3600", upsert: false, contentType: imageFile.type
+      });
+      if (uploadError) throw uploadError;
+
+      image_url = db.storage.from("product-images").getPublicUrl(filePath).data.publicUrl;
+    }
+
+    const { error } = await db.from("products").insert({ name, category, description, price, image_url });
+    if (error) throw error;
+
+    result.textContent = "✅ Article publié avec succès !";
+    document.getElementById("name").value = "";
+    document.getElementById("description").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("image").value = "";
+    document.getElementById("imagePreview").style.display = "none";
+    document.getElementById("imagePreview").removeAttribute("src");
+    await loadProducts();
+  } catch (error) {
+    result.textContent = "❌ " + (error.message || "Une erreur est survenue.");
+  } finally {
+    publishButton.disabled = false;
   }
-
-  document.getElementById("result").textContent =
-    "✅ Article publié avec succès !";
-
-  document.getElementById("name").value = "";
-  document.getElementById("description").value = "";
-  document.getElementById("price").value = "";
-  document.getElementById("image").value = "";
-
-  loadProducts();
 }
 
 // =====================================
